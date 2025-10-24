@@ -1,13 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 	  <DuckovPath>/Users/waterlens/Library/Application Support/Steam/steamapps/common/Escape from Duckov/Duckov.app/Contents/Resources/Data</DuckovPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="Library.fs" />
-  </ItemGroup>
 
   <ItemGroup>
 		<Reference Include="$(DuckovPath)\Managed\TeamSoda*.dll" />

@@ -5,7 +5,7 @@ echo 🚀 Starting build for Duckov++ Mod...
 
 rem --- Configuration ---
 set "MOD_NAME=DailyInterest"
-set "PROJECT_FILE_PATH=%MOD_NAME%.fsproj"
+set "PROJECT_FILE_PATH=%MOD_NAME%.csproj"
 set "BUILD_SOURCE_DIR=bin\Release\netstandard2.1\publish"
 set "OUTPUT_DIR=Output"
 

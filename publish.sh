@@ -6,7 +6,7 @@ echo "🚀 Starting build for Duckov++ Mod..."
 
 # --- Configuration ---
 MOD_NAME="DailyInterest"
-PROJECT_FILE_PATH="$MOD_NAME.fsproj"
+PROJECT_FILE_PATH="$MOD_NAME.csproj"
 BUILD_SOURCE_DIR="bin/Release/netstandard2.1/publish"
 OUTPUT_DIR="Output"
 
