@@ -10,8 +10,6 @@ namespace DailyInterest
 
     public static bool Initialized = false;
 
-    public const double InterestRate = 0.005; // 0.5% daily interest
-
     public static void NotifyEconomyReady()
     {
       EconomyReady = true;
