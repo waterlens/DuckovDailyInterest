@@ -113,18 +113,18 @@ namespace DailyInterest
       triggers.Add("INT", interest);
 
       string template;
-      int speed = 10;
 
       var langKey = MessageLocale.Lang.ToString();
       var gotTranslation = MessageLocale.Translations.TryGetValue(langKey, out var messages);
-      messages = messages.Where(msg => {
-        var result = safeExecute(msg.Trigger);
-        Debug.Log($"[Daily Interest] eval({msg.Trigger}) = {result}");
-        return result.ToBoolean();
-      }).ToList();
-
-      if (gotTranslation && messages.Any())
+      int speed = GetDefaultSpeed(langKey);
+      if (gotTranslation && messages != null && messages.Any())
       {
+        messages = messages.Where(msg =>
+        {
+          var result = safeExecute(msg.Trigger);
+          Debug.Log($"[Daily Interest] eval({msg.Trigger}) = {result}");
+          return result.ToBoolean();
+        }).ToList();
         var totalFrequency = messages.Sum(m => m.Frequency);
         if (totalFrequency > 0)
         {
@@ -181,6 +181,24 @@ namespace DailyInterest
         "Russian" => "Ежедневный процентный доход +$#{INT}",
         "Spanish" => "Ingresos por intereses diarios +$#{INT}",
         _ => "Daily Interest Income +$#{INT}"
+      };
+    }
+
+    private static int GetDefaultSpeed(string langKey)
+    {
+      return langKey switch
+      {
+        "ChineseSimplified" => 10,
+        "ChineseTraditional" => 10,
+        "English" => 20,
+        "French" => 20,
+        "German" => 20,
+        "Japanese" => 12,
+        "Korean" => 10,
+        "Portuguese" => 18,
+        "Russian" => 20,
+        "Spanish" => 22,
+        _ => 20,
       };
     }
   }
