@@ -57,7 +57,7 @@ namespace DailyInterest
             }
           }
           Translations[lang] = messages;
-          Debug.Log($"[DailyInterest] Loaded {messages.Count} messages for language '{lang}'");
+          Debug.Log($"[Daily Interest] Loaded {messages.Count} messages for language '{lang}'");
         }
       }
     }
@@ -125,12 +125,12 @@ namespace DailyInterest
           Debug.Log($"[Daily Interest] eval({msg.Trigger}) = {result}");
           return result.ToBoolean();
         }).ToList();
-        var totalFrequency = messages.Sum(m => m.Frequency);
+        var totalFrequency = messages.Sum(m => m == null ? 0 : m.Frequency);
         if (totalFrequency > 0)
         {
           var randomValue = MessageSource.Rand.Next(totalFrequency);
-          Message selectedMessage = null;
-          Debug.Log($"[DailyInterest] Total Freq {totalFrequency}, Rand {randomValue}");
+          Message selectedMessage = messages.FirstOrDefault();
+          Debug.Log($"[Daily Interest] Total Freq {totalFrequency}, Rand {randomValue}");
           foreach (var message in messages)
           {
             randomValue -= message.Frequency;
@@ -225,13 +225,14 @@ namespace DailyInterest
     {
       var inventory = LevelManager.Instance?.MainCharacter?.CharacterItem?.Inventory;
       var content = inventory?.Content;
-      if (content != null && content.Any()) return content.Max(item => item.Quality);
+      if (content != null && content.Any())
+        return content.Max(item => item != null ? item.Quality : 0);
       return 0;
     };
     static MessageSource()
     {
-      Debug.Log($"[DailyInterest] LuckDistribution Mean = {LuckDistribution.Mean} StdDev = {LuckDistribution.StdDev}");
-      Debug.Log($"[DailyInterest] RateDistribution Mean = {RateDistribution.Mean} StdDev = {RateDistribution.StdDev}");
+      Debug.Log($"[Daily Interest] LuckDistribution Mean = {LuckDistribution.Mean} StdDev = {LuckDistribution.StdDev}");
+      Debug.Log($"[Daily Interest] RateDistribution Mean = {RateDistribution.Mean} StdDev = {RateDistribution.StdDev}");
     }
   }
 }
