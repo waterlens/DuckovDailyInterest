@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -60,6 +62,7 @@ namespace DailyInterest
   public class ModBehaviour : Duckov.Modding.ModBehaviour
   {
     GameObject debugWindowObject;
+    private static string configFilePath;
 
     private static string GetEnableNotificationMessage(string langKey)
     {
@@ -88,6 +91,19 @@ namespace DailyInterest
          Keyboard.current.rightCommandKey.isPressed) && Keyboard.current.semicolonKey.wasPressedThisFrame)
       {
         ModMain.ShowNotifications = !ModMain.ShowNotifications;
+
+        if (ModMain.ShowNotifications)
+        {
+          if (File.Exists(configFilePath))
+          {
+            File.Delete(configFilePath);
+          }
+        }
+        else
+        {
+          File.Create(configFilePath).Close();
+        }
+
         var langKey = MessageLocale.Lang.ToString();
         var message = ModMain.ShowNotifications ? GetEnableNotificationMessage(langKey) : GetDisableNotificationMessage(langKey);
         Debug.Log($"[Daily Interest] ShowNotifications was changed to {ModMain.ShowNotifications}");
@@ -98,6 +114,12 @@ namespace DailyInterest
     public void OnEnable()
     {
       Debug.Log("[Daily Interest] Mod Enabled");
+
+      var assemblyLocation = Assembly.GetExecutingAssembly().Location;
+      configFilePath = Path.Combine(Path.GetDirectoryName(assemblyLocation), "NO_NOTIFICATION");
+      ModMain.ShowNotifications = !File.Exists(configFilePath);
+      Debug.Log($"[Daily Interest] ShowNotifications was set to {ModMain.ShowNotifications}");
+
       Duckov.Economy.EconomyManager.OnEconomyManagerLoaded += ModMain.NotifyEconomyReady;
       GameClock.OnGameClockStep += ModMain.NotifyGameClockStepped;
 
