@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Reflection;
+using Duckov.Economy;
 
 namespace DailyInterest
 {
@@ -66,7 +67,7 @@ namespace DailyInterest
   {
 
     Dictionary<String, Value> triggers;
-    TriggerEvaluator executor;
+    public TriggerEvaluator executor;
 
     public Value safeExecute(string input)
     {
@@ -91,12 +92,16 @@ namespace DailyInterest
           { "LUCK", MessageSource.TLuckTrigger () },
           { "LUCKM", MessageSource.TLuckMean () },
           { "WEATHER", MessageSource.TWeatherTrigger () },
+          { "WEATHER6", MessageSource.TWeatherHoursLaterTrigger (6) },
+          { "WEATHER4", MessageSource.TWeatherHoursLaterTrigger (4) },
           { "HOD", MessageSource.THourOfDay () },
           { "HDIFF", diff.TotalHours },
           { "MDIFF", diff.TotalMinutes },
           { "RATE", MessageSource.TRate () },
           { "RATEM", MessageSource.TRateMean () },
           { "BQ", MessageSource.TBestQualityOfItemsInInventory () },
+          { "BALANCE", MessageSource.TBalance () },
+          { "CASH", MessageSource.TCash () },
       };
       watch.Stop();
       Debug.Log($"[Daily Interest] execute triggers in {watch.Elapsed.TotalMilliseconds} ms.");
@@ -190,8 +195,11 @@ namespace DailyInterest
 
     public static Func<Value> TLuckMean = () => LuckDistribution.Mean;
     public static Func<Value> TLuckTrigger = () => LuckDistribution.Sample();
+    // Weather: Sunny,Cloudy,Rainy,Stormy_I,Stormy_II
     public static Func<Value> TWeatherTrigger = () => (double)(int)WeatherManager.GetWeather();
-    public static Func<Value> TWeatherSixHoursLaterTrigger = () => (double)(int)WeatherManager.GetWeather(GameClock.Now + TimeSpan.FromHours(6));
+    public static Func<int, Value> TWeatherHoursLaterTrigger = (n) => (double)(int)WeatherManager.GetWeather(GameClock.Now + TimeSpan.FromHours(n));
+    public static Func<Value> TBalance = () => (double)EconomyManager.Money;
+    public static Func<Value> TCash = () => (double)EconomyManager.Cash;
     public static Func<Value> THourOfDay = () => (double)GameClock.Hour;
     public static Func<Value> TRate = () => RateDistribution.Sample();
     public static Func<Value> TRateMean = () => RateDistribution.Mean;

@@ -27,4 +27,11 @@ fi
 # Copy the mod directory
 cp -r "$MOD_RELEASE_DIR" "$GAME_MOD_DIR/"
 
+# Create the NODEBUG_DAILY_INTEREST file to disable debug features
+if [ "$1" != "debug" ]; then
+    touch "$GAME_MOD_DIR/$MOD_NAME/NODEBUG_DAILY_INTEREST"
+else
+    echo "🐞 Debug mode enabled"
+fi
+
 echo "✅ Mod successfully deployed to '$GAME_MOD_DIR'"

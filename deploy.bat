@@ -26,6 +26,13 @@ if not exist "%GAME_MOD_DIR%" (
 rem Copy the mod directory
 xcopy /s /e /y "%MOD_RELEASE_DIR%" "%GAME_MOD_DIR%\%MOD_NAME%\"
 
+rem Create the NODEBUG_DAILY_INTEREST file to disable debug features
+if /i not "%1" == "debug" (
+    type nul > "%GAME_MOD_DIR%\%MOD_NAME%\NODEBUG_DAILY_INTEREST"
+) else (
+    echo 🐞 Debug mode enabled
+)
+
 echo ✅ Mod successfully deployed to '%GAME_MOD_DIR%'
 
 endlocal

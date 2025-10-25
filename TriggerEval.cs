@@ -110,9 +110,9 @@ namespace DailyInterest
     {
       { "floor", v => Math.Floor(v.ToNumber()) },
       { "ceiling", v => Math.Ceiling(v.ToNumber()) },
-      { "truncate", v => Math.Ceiling(v.ToNumber()) },
+      { "truncate", v => Math.Truncate(v.ToNumber()) },
       { "abs", v => Math.Abs(v.ToNumber()) },
-      { "sign", v => Math.Abs(v.ToNumber()) },
+      { "sign", v => Math.Sign(v.ToNumber()) },
       { "print", v => { Console.WriteLine(v); return v; } },
     };
 
@@ -286,9 +286,10 @@ namespace DailyInterest
           }
           else if (token == "+" || token == "-")
           {
-            int precedence = GetPrefixPrecedence(token);
+            var op = token;
+            int precedence = GetPrefixPrecedence(op);
             ParseWithAff(precedence);
-            if (token == "-")
+            if (op == "-")
             {
               Value r;
               if (!evalStack.TryPop(out r))
