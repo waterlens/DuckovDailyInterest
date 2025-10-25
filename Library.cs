@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DailyInterest
 {
@@ -9,6 +10,8 @@ namespace DailyInterest
     public static TimeSpan LastDate;
 
     public static bool Initialized = false;
+
+    public static bool ShowNotifications = true;
 
     public static void NotifyEconomyReady()
     {
@@ -43,7 +46,7 @@ namespace DailyInterest
 
           var result = Duckov.Economy.EconomyManager.Add(increase);
 
-          if (result) mi.ShowMessage(increase);
+          if (result && ShowNotifications) mi.ShowMessage(increase);
 
           var text = result ? "succeeded" : "failed";
           Debug.Log($"[Daily Interest] Added {increase} units of currency due to day advancement: {text}");
@@ -57,6 +60,40 @@ namespace DailyInterest
   public class ModBehaviour : Duckov.Modding.ModBehaviour
   {
     GameObject debugWindowObject;
+
+    private static string GetEnableNotificationMessage(string langKey)
+    {
+      return langKey switch
+      {
+        "ChineseSimplified" => "每日利息：消息提醒已开启",
+        _ => "Daily Interest: Notification Enabled"
+      };
+    }
+
+    private static string GetDisableNotificationMessage(string langKey)
+    {
+      return langKey switch
+      {
+        "ChineseSimplified" => "每日利息：消息提醒已关闭",
+        _ => "Daily Interest: Notification Disabled"
+      };
+    }
+
+    public void Update()
+    {
+      if (Keyboard.current != null &&
+        (Keyboard.current.leftCtrlKey.isPressed ||
+         Keyboard.current.rightCtrlKey.isPressed ||
+         Keyboard.current.leftCommandKey.isPressed ||
+         Keyboard.current.rightCommandKey.isPressed) && Keyboard.current.semicolonKey.wasPressedThisFrame)
+      {
+        ModMain.ShowNotifications = !ModMain.ShowNotifications;
+        var langKey = MessageLocale.Lang.ToString();
+        var message = ModMain.ShowNotifications ? GetEnableNotificationMessage(langKey) : GetDisableNotificationMessage(langKey);
+        Debug.Log($"[Daily Interest] ShowNotifications was changed to {ModMain.ShowNotifications}");
+        LevelManager.Instance?.MainCharacter?.PopText(message);
+      }
+    }
 
     public void OnEnable()
     {
