@@ -113,6 +113,7 @@ namespace DailyInterest
       { "truncate", v => Math.Ceiling(v.ToNumber()) },
       { "abs", v => Math.Abs(v.ToNumber()) },
       { "sign", v => Math.Abs(v.ToNumber()) },
+      { "print", v => { Console.WriteLine(v); return v; } },
     };
 
     public TriggerEvaluator(Dictionary<String, Value> triggers)
@@ -239,11 +240,12 @@ namespace DailyInterest
       switch (op)
       {
         // left-associative operators (l, l + 1)
-        case "||": return (1, 2);
-        case "&&": return (2, 3);
-        case "==": case "!=": case "<": case ">": case "<=": case ">=": return (3, 4);
-        case "+": case "-": return (4, 5);
-        case "*": case "/": case "%": return (5, 6);
+        case ";": return (1, 2);
+        case "||": return (2, 3);
+        case "&&": return (3, 4);
+        case "==": case "!=": case "<": case ">": case "<=": case ">=": return (4, 5);
+        case "+": case "-": return (5, 6);
+        case "*": case "/": case "%": return (6, 7);
         case ":": return (9, 10);
         // right-associative operator (p + 1, p) per user request
         case "**": return (8, 7);
@@ -357,6 +359,7 @@ namespace DailyInterest
           ">=" => l >= r,
           "&&" => l && r,
           "||" => l || r,
+          ";" => r,
           _ => throw new TriggerEvalExn($"Unsupported operator {op}")
         };
         evalStack.Push(ans);
