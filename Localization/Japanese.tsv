@@ -1,4 +1,4 @@
-ID	MESSAGE FREQUENCY	TRIGGER
+ID	MESSAGE	FREQUENCY	TRIGGER
 0	本日の利息収入は $#{INT} です	20	true
 1	ガー！口座が本日、金の卵を産みました。利息収入 $#{INT} です	10	true
 2	資産運用するアヒルの運は悪くありません。$#{INT} を獲得しました	10	LUCK>LUCKM+0.1
@@ -53,7 +53,7 @@ ID	MESSAGE FREQUENCY	TRIGGER
 57	銀行残高が百万を超えました！利息 +$#{INT}	50	BALANCE>1000000
 58	只今深夜。夜更かしさんにお小遣いです：+$#{INT}	10	HOD>=22||HOD<=4
 59	今日の運勢：凶。でもご心配なく。少なくとも利息はあります：+$#{INT}	10	LUCK<0.2
-60	利率変動、本日の利率は（RATE*100)%！利息 +$#{INT}	10	true
+60	利率変動、本日の利率は #{RATE*100}%！利息 +$#{INT}	10	true
 61	バックパックにお宝が入っていますね！利息 +$#{INT}	3	BQ >= 8
 62	最近、深刻な寝不足だそうですね。よしよし、 $#{INT} をどうぞ	30	MDIFF<60
 63	#{HDIFF} 時間しか寝ていないのですか？健康なアヒルは一日8時間寝るものですよ	40	HDIFF>1&&HDIFF<7

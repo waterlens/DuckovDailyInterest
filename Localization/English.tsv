@@ -53,7 +53,7 @@ ID	MESSAGE	FREQUENCY	TRIGGER
 57	Your bank balance has exceeded one million! Interest +$#{INT}	50	BALANCE>1000000
 58	It's late at night, night owls get paid: +$#{INT}	10	HOD>=22||HOD<=4
 59	Today's fortune: Poor, but it doesn't matter, at least there's interest: +$#{INT}	10	LUCK<0.2
-60	Rate fluctuation, today's rate is (RATE*100)%! Interest +$#{INT}	10	true
+60	Rate fluctuation, today's rate is #{RATE*100}%! Interest +$#{INT}	10	true
 61	There's treasure in your backpack! Interest +$#{INT}	3	BQ >= 8
 62	We heard you've been severely sleep-deprived lately. Pat-pat, here's $#{INT} for you	30	MDIFF<60
 63	You only slept #{HDIFF} hours? A healthy duck sleeps 8 hours a day.	40	HDIFF>1&&HDIFF<7
