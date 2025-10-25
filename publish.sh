@@ -49,6 +49,31 @@ else
     echo "  ⚠️ NOTE: preview.png not found. You can add one to the '$MOD_NAME' folder."
 fi
 
+# Copy MathNet.Numerics.dll if it exists
+if [ -f "MathNet.Numerics.dll" ]; then
+    cp "MathNet.Numerics.dll" "$MOD_RELEASE_DIR/"
+    echo "  ✓ MathNet.Numerics.dll"
+else
+    echo "  ⚠️ NOTE: preview.png not found. You can add one to the '$MOD_NAME' folder."
+fi
+
+# Copy Localization files
+if [ -d "Localization" ]; then
+    mkdir -p "$MOD_RELEASE_DIR/Localization"
+    echo "  - Copying localization files..."
+    
+    languages=("ChineseSimplified" "ChineseTraditional" "English" "French" "German" "Japanese" "Korean" "Portuguese" "Russian" "Spanish")
+
+    for lang in "${languages[@]}"; do
+        if [ -f "Localization/${lang}.tsv" ]; then
+            cp "Localization/${lang}.tsv" "$MOD_RELEASE_DIR/Localization/"
+            echo "    ✓ ${lang}.tsv"
+        fi
+    done
+else
+    echo "  ⚠️ WARNING: Localization directory not found."
+fi
+
 # --- 5. Final verification ---
 echo ""
 echo "📦 Release folder content:"

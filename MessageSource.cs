@@ -23,7 +23,7 @@ namespace DailyInterest
     public static Dictionary<string, List<Message>> Translations = new Dictionary<string, List<Message>>();
     public static SystemLanguage Lang => SodaCraft.Localizations.LocalizationManager.CurrentLanguage;
     static MessageLocale()
-    { 
+    {
       var assembly = Assembly.GetExecutingAssembly();
       var assemblyDirectory = Path.GetDirectoryName(assembly.Location);
       var localeDirectory = Path.Combine(assemblyDirectory, "Localization");
@@ -73,7 +73,8 @@ namespace DailyInterest
       try
       {
         executor.Eval(input);
-        return executor.PeekResult();
+        var result = executor.PeekResult() ?? 0;
+        return result;
       }
       catch (TriggerEvalExn exn)
       {
@@ -84,21 +85,22 @@ namespace DailyInterest
     public double Rate => triggers["RATE"].ToNumber();
     public MessageInstance(TimeSpan diff)
     {
+      var watch = System.Diagnostics.Stopwatch.StartNew();
       triggers = new Dictionary<string, Value>
       {
           { "LUCK", MessageSource.TLuckTrigger () },
+          { "LUCKM", MessageSource.TLuckMean () },
           { "WEATHER", MessageSource.TWeatherTrigger () },
           { "HOD", MessageSource.THourOfDay () },
           { "HDIFF", diff.TotalHours },
           { "MDIFF", diff.TotalMinutes },
           { "RATE", MessageSource.TRate () },
+          { "RATEM", MessageSource.TRateMean () },
           { "BQ", MessageSource.TBestQualityOfItemsInInventory () },
       };
+      watch.Stop();
+      Debug.Log($"[Daily Interest] execute triggers in {watch.Elapsed.TotalMilliseconds} ms.");
       executor = new TriggerEvaluator(triggers);
-    }
-
-    public void filterMessages(List<Message> messages)
-    {
     }
 
     public void ShowMessage(Int64 interest)
@@ -110,7 +112,11 @@ namespace DailyInterest
 
       var langKey = MessageLocale.Lang.ToString();
       var gotTranslation = MessageLocale.Translations.TryGetValue(langKey, out var messages);
-      messages = messages.Where(msg => safeExecute(msg.Trigger).ToBoolean()).ToList();
+      messages = messages.Where(msg => {
+        var result = safeExecute(msg.Trigger);
+        Debug.Log($"[Daily Interest] eval({msg.Trigger}) = {result}");
+        return result.ToBoolean();
+      }).ToList();
 
       if (gotTranslation && messages.Any())
       {
@@ -180,13 +186,15 @@ namespace DailyInterest
     // https://mathlets.org/mathlets/beta-distribution/
     static BetaScaled LuckDistribution = new BetaScaled(25.0, 20.0, 0, 1.0, Rand);
 
-    static BetaScaled RateDistribution = new BetaScaled(2.0, 7.0, 0.004, 0.004, Rand);
+    static BetaScaled RateDistribution = new BetaScaled(2.0, 7.0, 0.0042, 0.004, Rand);
 
+    public static Func<Value> TLuckMean = () => LuckDistribution.Mean;
     public static Func<Value> TLuckTrigger = () => LuckDistribution.Sample();
     public static Func<Value> TWeatherTrigger = () => (double)(int)WeatherManager.GetWeather();
     public static Func<Value> TWeatherSixHoursLaterTrigger = () => (double)(int)WeatherManager.GetWeather(GameClock.Now + TimeSpan.FromHours(6));
     public static Func<Value> THourOfDay = () => (double)GameClock.Hour;
     public static Func<Value> TRate = () => RateDistribution.Sample();
+    public static Func<Value> TRateMean = () => RateDistribution.Mean;
     public static Func<Value> TBestQualityOfItemsInInventory = () =>
     {
       var inventory = LevelManager.Instance?.MainCharacter?.CharacterItem?.Inventory;
@@ -196,8 +204,8 @@ namespace DailyInterest
     };
     static MessageSource()
     {
-      Debug.Log($"LuckDistribution Mean = {LuckDistribution.Mean} StdDev = {LuckDistribution.StdDev}");
-      Debug.Log($"RateDistribution Mean = {RateDistribution.Mean} StdDev = {RateDistribution.StdDev}");
+      Debug.Log($"[DailyInterest] LuckDistribution Mean = {LuckDistribution.Mean} StdDev = {LuckDistribution.StdDev}");
+      Debug.Log($"[DailyInterest] RateDistribution Mean = {RateDistribution.Mean} StdDev = {RateDistribution.StdDev}");
     }
   }
 }

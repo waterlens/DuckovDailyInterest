@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using System;
+using MathNet.Numerics;
 
 namespace DailyInterest
 {
@@ -105,12 +106,18 @@ namespace DailyInterest
 
     Stack<Value> evalStack;
     Dictionary<String, Value> triggers;
-    Dictionary<String, Func<Value, Value>> handlers;
+    static Dictionary<String, Func<Value, Value>> handlers = new Dictionary<string, Func<Value, Value>>
+    {
+      { "floor", v => Math.Floor(v.ToNumber()) },
+      { "ceiling", v => Math.Ceiling(v.ToNumber()) },
+      { "truncate", v => Math.Ceiling(v.ToNumber()) },
+      { "abs", v => Math.Abs(v.ToNumber()) },
+      { "sign", v => Math.Abs(v.ToNumber()) },
+    };
 
-    public TriggerEvaluator(Dictionary<String, Value> triggers, Dictionary<String, Func<Value, Value>> handlers = null)
+    public TriggerEvaluator(Dictionary<String, Value> triggers)
     {
       this.triggers = triggers;
-      this.handlers = handlers ?? new Dictionary<string, Func<Value, Value>>();
     }
     public Value PeekResult()
     {
@@ -133,7 +140,9 @@ namespace DailyInterest
       token = null;
       evalStack = new Stack<Value>();
       ParseWithAff(0);
-      if (tokenKind != TokenKind.EOF)
+
+      var (peekedToken, peekedKind) = PeekToken();
+      if (peekedKind != TokenKind.EOF)
         throw new TriggerEvalExn("Extra characters at end of expression");
     }
 

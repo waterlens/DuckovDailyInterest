@@ -15,7 +15,7 @@ namespace DailyInterest
         public static void NotifyEconomyReady()
         {
             EconomyReady = true;
-            Debug.Log("[Interest] Economy Manager Loaded");
+            Debug.Log("[Daily Interest] Economy Manager Loaded");
         }
 
         public static void NotifyGameClockStepped()
@@ -26,19 +26,21 @@ namespace DailyInterest
             {
                 LastDate = currentDate;
                 Initialized = true;
-                Debug.Log($"[Interest] Game Clock Stepped - Initial Day Set to {LastDate}");
+                Debug.Log($"[Daily Interest] Game Clock Stepped - Initial Day Set to {LastDate}");
             }
             else if (Initialized && currentDate.Days > LastDate.Days)
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                var diffDays = currentDate.Days - LastDate.Days;
                 var diff = currentDate - LastDate;
                 LastDate = currentDate;
-                Debug.Log($"[Interest] Game Clock Stepped - Day advanced by {diff} to {LastDate}");
+                Debug.Log($"[Daily Interest] Game Clock Stepped - Day advanced by {diff} to {LastDate}");
 
                 if (EconomyReady)
                 {
                     var mi = new MessageInstance(diff);
 
-                    var rate = Math.Pow(1.0 + mi.Rate, diff.Days) - 1.0;
+                    var rate = Math.Pow(1.0 + mi.Rate, diffDays) - 1.0;
                     var increase = (long)Math.Floor(Duckov.Economy.EconomyManager.Money * rate);
 
                     var result = Duckov.Economy.EconomyManager.Add(increase);
@@ -46,8 +48,10 @@ namespace DailyInterest
                     if (result) mi.ShowMessage(increase);
 
                     var text = result ? "succeeded" : "failed";
-                    Debug.Log($"[Interest] Added {increase} units of currency due to day advancement: {text}");
+                    Debug.Log($"[Daily Interest] Added {increase} units of currency due to day advancement: {text}");
                 }
+                watch.Stop();
+                Debug.Log($"[Daily Interest] Finished in {watch.Elapsed.TotalMilliseconds} ms");
             }
         }
     }
@@ -56,14 +60,14 @@ namespace DailyInterest
     {
         public void OnEnable()
         {
-            Debug.Log("[Interest] Mod Enabled");
+            Debug.Log("[Daily Interest] Mod Enabled");
             Duckov.Economy.EconomyManager.OnEconomyManagerLoaded += ModMain.NotifyEconomyReady;
             GameClock.OnGameClockStep += ModMain.NotifyGameClockStepped;
         }
 
         public void OnDisable()
         {
-            Debug.Log("[Interest] Mod Disabled");
+            Debug.Log("[Daily Interest] Mod Disabled");
             Duckov.Economy.EconomyManager.OnEconomyManagerLoaded -= ModMain.NotifyEconomyReady;
             GameClock.OnGameClockStep -= ModMain.NotifyGameClockStepped;
             ModMain.EconomyReady = false;

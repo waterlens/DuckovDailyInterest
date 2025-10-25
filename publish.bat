@@ -48,6 +48,28 @@ if exist "preview.png" (
     echo   ⚠️ NOTE: preview.png not found. You can add one to the '%MOD_NAME%' folder.
 )
 
+rem Copy MathNet.Numerics
+if exist "MathNet.Numerics.dll" (
+    copy "MathNet.Numerics.dll" "%MOD_RELEASE_DIR%\"
+    echo   ✓ preview.png
+) else (
+    echo   ⚠️ NOTE: MathNet.Numerics.dll not found. You can add one to the '%MOD_NAME%' folder.
+)
+
+rem Copy Localization files
+if exist "Localization" (
+    mkdir "%MOD_RELEASE_DIR%\Localization"
+    echo   - Copying localization files...
+    for %%L in (ChineseSimplified ChineseTraditional English French German Japanese Korean Portuguese Russian Spanish) do (
+        if exist "Localization\%%L.tsv" (
+            copy "Localization\%%L.tsv" "%MOD_RELEASE_DIR%\Localization\" /Y > nul
+            echo     ✓ %%L.tsv
+        )
+    )
+) else (
+    echo   ⚠️ WARNING: Localization directory not found.
+)
+
 rem --- 5. Final verification ---
 echo.
 echo 📦 Release folder content:
