@@ -66,7 +66,7 @@ namespace DailyInterest
   public class MessageInstance
   {
 
-    Dictionary<String, Value> triggers;
+    Dictionary<string, Lazy<Value>> triggers;
     public TriggerEvaluator executor;
 
     public Value safeExecute(string input)
@@ -83,34 +83,34 @@ namespace DailyInterest
       }
       return false;
     }
-    public double Rate => triggers["RATE"].ToNumber();
+    public double Rate => triggers["RATE"].Value.ToNumber();
     public MessageInstance(TimeSpan diff)
     {
       var watch = System.Diagnostics.Stopwatch.StartNew();
-      triggers = new Dictionary<string, Value>
+      triggers = new Dictionary<string, Lazy<Value>>
       {
-          { "LUCK", MessageSource.TLuckTrigger () },
-          { "LUCKM", MessageSource.TLuckMean () },
-          { "WEATHER", MessageSource.TWeatherTrigger () },
-          { "WEATHER6", MessageSource.TWeatherHoursLaterTrigger (6) },
-          { "WEATHER4", MessageSource.TWeatherHoursLaterTrigger (4) },
-          { "HOD", MessageSource.THourOfDay () },
-          { "HDIFF", diff.TotalHours },
-          { "MDIFF", diff.TotalMinutes },
-          { "RATE", MessageSource.TRate () },
-          { "RATEM", MessageSource.TRateMean () },
-          { "BQ", MessageSource.TBestQualityOfItemsInInventory () },
-          { "BALANCE", MessageSource.TBalance () },
-          { "CASH", MessageSource.TCash () },
+          { "LUCK", new Lazy<Value>(MessageSource.TLuckTrigger) },
+          { "LUCKM", new Lazy<Value>(MessageSource.TLuckMean) },
+          { "WEATHER", new Lazy<Value>(MessageSource.TWeatherTrigger) },
+          { "WEATHER6", new Lazy<Value>(() => MessageSource.TWeatherHoursLaterTrigger(6)) },
+          { "WEATHER4", new Lazy<Value>(() => MessageSource.TWeatherHoursLaterTrigger(4)) },
+          { "HOD", new Lazy<Value>(MessageSource.THourOfDay) },
+          { "HDIFF", new Lazy<Value>(() => diff.TotalHours) },
+          { "MDIFF", new Lazy<Value>(diff.TotalMinutes) },
+          { "RATE", new Lazy<Value>(MessageSource.TRate) },
+          { "RATEM", new Lazy<Value>(MessageSource.TRateMean) },
+          { "BQ", new Lazy<Value>(MessageSource.TBestQualityOfItemsInInventory) },
+          { "BALANCE", new Lazy<Value>(MessageSource.TBalance) },
+          { "CASH", new Lazy<Value>(MessageSource.TCash) },
       };
       watch.Stop();
-      Debug.Log($"[Daily Interest] execute triggers in {watch.Elapsed.TotalMilliseconds} ms.");
+      Debug.Log($"[Daily Interest] Execute triggers in {watch.Elapsed.TotalMilliseconds} ms.");
       executor = new TriggerEvaluator(triggers);
     }
 
     public void ShowMessage(Int64 interest)
     {
-      triggers.Add("INT", interest);
+      triggers.Add("INT", new Lazy<Value>(() => interest));
 
       string template;
 
@@ -161,7 +161,7 @@ namespace DailyInterest
         var key = match.Groups[1].Value;
         var result = safeExecute(key);
         if (result != null)
-          return result.ToString();
+          return string.Format("{}", result);
         return match.Value;
       });
     }

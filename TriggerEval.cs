@@ -76,7 +76,7 @@ namespace DailyInterest
 
     public override string ToString()
     {
-      return numberValue.ToString();
+      return numberValue.ToString("0.##");
     }
   }
 
@@ -105,8 +105,8 @@ namespace DailyInterest
     TokenKind tokenKind;
 
     Stack<Value> evalStack;
-    Dictionary<String, Value> triggers;
-    static Dictionary<String, Func<Value, Value>> handlers = new Dictionary<string, Func<Value, Value>>
+    Dictionary<string, Lazy<Value>> triggers;
+    static Dictionary<string, Func<Value, Value>> handlers = new Dictionary<string, Func<Value, Value>>
     {
       { "floor", v => Math.Floor(v.ToNumber()) },
       { "ceiling", v => Math.Ceiling(v.ToNumber()) },
@@ -116,7 +116,7 @@ namespace DailyInterest
       { "print", v => { Console.WriteLine(v); return v; } },
     };
 
-    public TriggerEvaluator(Dictionary<String, Value> triggers)
+    public TriggerEvaluator(Dictionary<string, Lazy<Value>> triggers)
     {
       this.triggers = triggers;
     }
@@ -272,7 +272,7 @@ namespace DailyInterest
               throw new TriggerEvalExn($"Unable to find trigger {token}");
 
             var value = triggers[token];
-            evalStack.Push(value);
+            evalStack.Push(value.Value);
           }
           break;
         case TokenKind.OPERATOR:
