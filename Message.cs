@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Reflection;
 using Duckov.Economy;
+using ItemStatsSystem;
 
 namespace DailyInterest
 {
@@ -68,6 +69,17 @@ namespace DailyInterest
 
     Dictionary<string, Lazy<Value>> triggers;
     public TriggerEvaluator executor;
+
+    static MessageInstance()
+    {
+      TriggerEvaluator.registerHandler("give_luck_money", (Value x) =>
+      {
+        var item = ItemAssetsCollection.InstantiateSync(444);
+        if (item)
+          ItemUtilities.SendToPlayerStorage(item, true);
+        return x;
+      });
+    }
 
     public Value safeExecute(string input)
     {
@@ -161,7 +173,7 @@ namespace DailyInterest
         var key = match.Groups[1].Value;
         var result = safeExecute(key);
         if (result != null)
-          return string.Format("{}", result);
+          return result.ToString();
         return match.Value;
       });
     }
@@ -209,7 +221,7 @@ namespace DailyInterest
     // https://mathlets.org/mathlets/beta-distribution/
     static BetaScaled LuckDistribution = new BetaScaled(25.0, 20.0, 0, 1.0, Rand);
 
-    static BetaScaled RateDistribution = new BetaScaled(2.0, 7.0, 0.0042, 0.004, Rand);
+    static BetaScaled RateDistribution = new BetaScaled(2.0, 7.0, 0.00412, 0.004, Rand);
 
     public static Func<Value> TLuckMean = () => LuckDistribution.Mean;
     public static Func<Value> TLuckTrigger = () => LuckDistribution.Sample();
