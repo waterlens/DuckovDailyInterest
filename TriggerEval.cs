@@ -116,6 +116,11 @@ namespace DailyInterest
       { "print", v => { Console.WriteLine(v); return v; } },
     };
 
+    public static void registerHandler(string name, Func<Value, Value> action)
+    {
+      handlers.Add(name, action);
+    }
+
     public TriggerEvaluator(Dictionary<string, Lazy<Value>> triggers)
     {
       this.triggers = triggers;
