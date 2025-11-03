@@ -18,6 +18,7 @@ namespace DailyInterest
     public static void NotifyEconomyReady()
     {
       EconomyReady = true;
+      Initialized = false;
       Debug.Log("[Daily Interest] Economy Manager Loaded");
     }
 
@@ -43,7 +44,7 @@ namespace DailyInterest
         {
           var mi = new MessageInstance(diff);
 
-          diffDays = diffDays > 10 ? 10 : diffDays;
+          diffDays = diffDays > 2 ? 2 : diffDays;
 
           var rate = Math.Pow(1.0 + mi.Rate, diffDays) - 1.0;
           var increase = (long)Math.Floor(Duckov.Economy.EconomyManager.Money * rate);
